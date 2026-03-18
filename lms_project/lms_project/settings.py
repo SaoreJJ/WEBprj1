@@ -17,13 +17,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # Сторонние приложения
     'rest_framework',
-    
+    'django_filters',  # Добавьте это
+
     # Свои приложения
-    'users',
-    'materials',
+    'users',  # Должно быть здесь
+    'materials',  # Должно быть здесь
 ]
 
 MIDDLEWARE = [
