@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,11 +21,12 @@ INSTALLED_APPS = [
 
     # Сторонние приложения
     'rest_framework',
-    'django_filters',  # Добавьте это
+    'rest_framework_simplejwt',
+    'django_filters',
 
     # Свои приложения
-    'users',  # Должно быть здесь
-    'materials',  # Должно быть здесь
+    'users',
+    'materials',
 ]
 
 MIDDLEWARE = [
@@ -92,8 +94,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
 
+# Настройки DRF
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',  # Временно разрешаем все
-    ]
+        'rest_framework.permissions.IsAuthenticated',  # По умолчанию все эндпоинты требуют авторизации
+    ],
+}
+
+# Настройки JWT
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
