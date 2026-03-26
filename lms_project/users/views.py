@@ -1,14 +1,13 @@
 from rest_framework import viewsets, filters, generics, permissions
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import User, Payment
+from django.shortcuts import get_object_or_404
+from .models import User, Payment, Subscription
 from .serializers import UserSerializer, PaymentSerializer, UserRegistrationSerializer
 from .permissions import IsModerator, IsOwner
-from rest_framework.response import Response
-from rest_framework.decorators import action
-from .serializers import UserPublicSerializer
-from .permissions import IsOwnerProfile
+from materials.models import Course
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -16,23 +15,23 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        # Пользователь может видеть только свой профиль
+        if self.action == 'list':
+            return User.objects.filter(id=self.request.user.id)
+        return super().get_queryset()
+
     def get_serializer_class(self):
         # Для просмотра чужого профиля используем публичный сериализатор
         if self.action == 'retrieve' and self.request.user != self.get_object():
+            from .serializers import UserPublicSerializer
             return UserPublicSerializer
         return super().get_serializer_class()
 
     def get_permissions(self):
         if self.action in ['update', 'partial_update']:
-            # Редактировать может только владелец профиля
-            return [IsAuthenticated(), IsOwnerProfile()]
+            return [IsAuthenticated(), IsOwner()]
         return super().get_permissions()
-
-    def get_queryset(self):
-        # Пользователь может видеть только свой профиль в списке
-        if self.action == 'list':
-            return User.objects.filter(id=self.request.user.id)
-        return super().get_queryset()
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -53,3 +52,40 @@ class PaymentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # Пользователь может видеть только свои платежи
         return Payment.objects.filter(user=self.request.user)
+
+
+class SubscriptionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        course_id = request.data.get('course_id')
+
+        if not course_id:
+            return Response(
+                {"error": "Не указан ID курса"},
+                status=400
+            )
+
+        course = get_object_or_404(Course, id=course_id)
+
+        # Проверяем, есть ли уже подписка
+        subscription = Subscription.objects.filter(user=user, course=course)
+
+        if subscription.exists():
+            # Если подписка есть - удаляем
+            subscription.delete()
+            message = "Подписка удалена"
+            subscribed = False
+        else:
+            # Если подписки нет - создаем
+            Subscription.objects.create(user=user, course=course)
+            message = "Подписка добавлена"
+            subscribed = True
+
+        return Response({
+            "message": message,
+            "subscribed": subscribed,
+            "course_id": course.id,
+            "course_title": course.title
+        })

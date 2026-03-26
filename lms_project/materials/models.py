@@ -1,12 +1,11 @@
 from django.db import models
-from users.models import User
 
 
 class Course(models.Model):
     title = models.CharField(max_length=200, verbose_name='Название курса')
     preview = models.ImageField(upload_to='courses/previews/', verbose_name='Превью', blank=True, null=True)
     description = models.TextField(verbose_name='Описание курса')
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True,
+    owner = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True, blank=True,
                               related_name='courses', verbose_name='Владелец')
 
     class Meta:
@@ -23,7 +22,7 @@ class Lesson(models.Model):
     preview = models.ImageField(upload_to='lessons/previews/', verbose_name='Превью', blank=True, null=True)
     video_link = models.URLField(verbose_name='Ссылка на видео', max_length=500)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lessons', verbose_name='Курс')
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True,
+    owner = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True, blank=True,
                               related_name='lessons', verbose_name='Владелец')
 
     class Meta:

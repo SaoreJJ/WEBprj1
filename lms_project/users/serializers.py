@@ -3,18 +3,14 @@ from .models import User, Payment
 
 
 class PaymentSerializer(serializers.ModelSerializer):
+    user_email = serializers.CharField(source='user.email', read_only=True)
+    course_title = serializers.CharField(source='course.title', read_only=True, allow_null=True)
+    lesson_title = serializers.CharField(source='lesson.title', read_only=True, allow_null=True)
+
     class Meta:
         model = Payment
-        fields = ['id', 'payment_date', 'course', 'lesson', 'amount', 'payment_method']
-
-
-class UserSerializer(serializers.ModelSerializer):
-    payments = PaymentSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = User
-        fields = ['id', 'email', 'first_name', 'last_name', 'phone', 'city', 'avatar', 'payments']
-        read_only_fields = ['id']
+        fields = ['id', 'user', 'user_email', 'payment_date', 'course', 'course_title',
+                  'lesson', 'lesson_title', 'amount', 'payment_method']
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -37,10 +33,18 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
 
 
-class UserPublicSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для публичной информации о пользователе
-    """
+class UserSerializer(serializers.ModelSerializer):
+    payments = PaymentSerializer(many=True, read_only=True)
+
     class Meta:
         model = User
-        fields = ['id', 'email', 'phone', 'city', 'avatar']  # Без пароля, фамилии и платежей
+        fields = ['id', 'email', 'first_name', 'last_name', 'phone', 'city', 'avatar', 'payments']
+        read_only_fields = ['id']
+
+
+class UserPublicSerializer(serializers.ModelSerializer):
+    """Сериализатор для публичной информации о пользователе"""
+
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'phone', 'city', 'avatar']

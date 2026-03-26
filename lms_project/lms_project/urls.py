@@ -18,7 +18,7 @@ urlpatterns = [
     # Уроки оставляем как есть, потому что они используют generic views
     path('api/lessons/', LessonListCreateView.as_view(), name='lesson-list'),
     path('api/lessons/<int:pk>/', LessonRetrieveUpdateDestroyView.as_view(), name='lesson-detail'),
-    path('api/auth/', include('users.urls')),  # Все эндпоинты авторизации
+    path('api/auth/', include('users.urls')),
 ]
 
 if settings.DEBUG:
