@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
 from users.views import UserViewSet, PaymentViewSet
 from materials.views import CourseViewSet, LessonListCreateView, LessonRetrieveUpdateDestroyView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
 # Создаем единый роутер для всех ViewSet
 router = DefaultRouter()
@@ -19,7 +20,11 @@ urlpatterns = [
     path('api/lessons/', LessonListCreateView.as_view(), name='lesson-list'),
     path('api/lessons/<int:pk>/', LessonRetrieveUpdateDestroyView.as_view(), name='lesson-detail'),
     path('api/auth/', include('users.urls')),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

@@ -1,6 +1,9 @@
 import os
 from pathlib import Path
 from datetime import timedelta
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,6 +30,8 @@ INSTALLED_APPS = [
     # Свои приложения
     'users',
     'materials',
+
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -102,6 +107,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',  # По умолчанию все эндпоинты требуют авторизации
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # Настройки JWT
@@ -110,3 +116,15 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'LMS API',
+    'DESCRIPTION': 'API для онлайн-платформы обучения',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
+
+
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:8000')
+STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY', 'pk_test_...')

@@ -6,11 +6,15 @@ class PaymentSerializer(serializers.ModelSerializer):
     user_email = serializers.CharField(source='user.email', read_only=True)
     course_title = serializers.CharField(source='course.title', read_only=True, allow_null=True)
     lesson_title = serializers.CharField(source='lesson.title', read_only=True, allow_null=True)
+    payment_url = serializers.CharField(read_only=True)  # ссылка на оплату
 
     class Meta:
         model = Payment
         fields = ['id', 'user', 'user_email', 'payment_date', 'course', 'course_title',
-                  'lesson', 'lesson_title', 'amount', 'payment_method']
+                 'lesson', 'lesson_title', 'amount', 'payment_method', 'stripe_product_id',
+                 'stripe_price_id', 'stripe_session_id', 'payment_url', 'status']
+        read_only_fields = ['payment_url', 'stripe_product_id', 'stripe_price_id',
+                           'stripe_session_id', 'status']
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
