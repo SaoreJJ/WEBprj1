@@ -6,7 +6,7 @@ import random
 
 
 class Command(BaseCommand):
-    help = 'Заполняет таблицу платежей тестовыми данными'
+    help = "Заполняет таблицу платежей тестовыми данными"
 
     def handle(self, *args, **options):
         # Очищаем существующие платежи
@@ -15,7 +15,9 @@ class Command(BaseCommand):
         # Получаем пользователей (или создаем, если их нет)
         users = User.objects.all()
         if not users.exists():
-            self.stdout.write(self.style.WARNING('Нет пользователей. Сначала создайте пользователей.'))
+            self.stdout.write(
+                self.style.WARNING("Нет пользователей. Сначала создайте пользователей.")
+            )
             return
 
         # Получаем курсы и уроки
@@ -23,10 +25,14 @@ class Command(BaseCommand):
         lessons = list(Lesson.objects.all())
 
         if not courses and not lessons:
-            self.stdout.write(self.style.WARNING('Нет курсов и уроков. Сначала создайте курсы и уроки.'))
+            self.stdout.write(
+                self.style.WARNING(
+                    "Нет курсов и уроков. Сначала создайте курсы и уроки."
+                )
+            )
             return
 
-        payment_methods = ['cash', 'transfer']
+        payment_methods = ["cash", "transfer"]
 
         # Создаем тестовые платежи
         for i in range(10):
@@ -51,9 +57,9 @@ class Command(BaseCommand):
                 course=course,
                 lesson=lesson,
                 amount=amount,
-                payment_method=random.choice(payment_methods)
+                payment_method=random.choice(payment_methods),
             )
 
-            self.stdout.write(self.style.SUCCESS(f'Создан платеж: {payment}'))
+            self.stdout.write(self.style.SUCCESS(f"Создан платеж: {payment}"))
 
-        self.stdout.write(self.style.SUCCESS('Тестовые платежи успешно созданы!'))
+        self.stdout.write(self.style.SUCCESS("Тестовые платежи успешно созданы!"))
